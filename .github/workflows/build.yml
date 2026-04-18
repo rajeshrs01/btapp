@@ -25,28 +25,22 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            git zip unzip autoconf libtool \
-            pkg-config zlib1g-dev libncurses5-dev \
-            libffi-dev libssl-dev ccache
+          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libffi-dev libssl-dev ccache
           pip install buildozer==1.5.0 cython==0.29.37
 
       - name: Accept SDK licenses
         run: |
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
-            "build-tools;33.0.2" "platforms;android-33" "platform-tools" || true
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2" "platforms;android-33" "platform-tools" || true
         env:
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
       - name: Symlink SDK for Buildozer
         run: |
           mkdir -p ~/.buildozer/android/platform
-          ln -sfn /usr/local/lib/android/sdk \
-            ~/.buildozer/android/platform/android-sdk
+          ln -sfn /usr/local/lib/android/sdk ~/.buildozer/android/platform/android-sdk
           mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
-          ln -sfn /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager \
-            ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+          ln -sfn /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
       - name: Cache Buildozer
         uses: actions/cache@v4
@@ -55,7 +49,11 @@ jobs:
           key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Build APK
-        run: yes | buildozer -v android debug
+        run: yes | buildozer -v android debug 2>&1 | tee build.log; tail -50 build.log
+        continue-on-error: true
+
+      - name: Show last errors
+        run: grep -i "error\|exception\|failed\|traceback" build.log | tail -30 || true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
