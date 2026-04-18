@@ -1,0 +1,3 @@
+kivy==2.3.0
+pybluez==0.23
+pyaudio==0.2.14
