@@ -8,41 +8,21 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-22.04
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
         with:
-          python-version: "3.10"
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libffi-dev libssl-dev openjdk-11-jdk ccache
-
-      - name: Install Buildozer & Cython
-        run: pip install buildozer==1.5.0 cython==0.29.37
-
-      - name: Accept Android SDK licenses
-        run: |
-          mkdir -p ~/.android
-          echo "count=0" > ~/.android/repositories.cfg
-          yes | buildozer android debug 2>&1 | head -5 || true
-          find ~/.buildozer -name "sdkmanager" 2>/dev/null | head -1 | xargs -I{} sh -c 'yes | {} --sdk_root=$(dirname $(dirname {})) --licenses' || true
-
-      - name: Cache Buildozer
-        uses: actions/cache@v4
-        with:
-          path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
-
-      - name: Build APK
-        run: |
-          yes | buildozer android debug
+          command: android debug
+          buildozer_version: stable
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: bluetooth-app-debug.apk
-          path: bin/*.apk
+          path: ${{ steps.buildozer.outputs.filename }}
           retention-days: 30
+
