@@ -5,13 +5,14 @@ title = BluetoothApp
 package.name = bluetoothapp
 package.domain = com.example
 
-source.dir = src
+source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
 version = 1.0.0
 
 # Kivy entry point
-entrypoint = main
+entrypoint = src/main.py
+
 
 # Python requirements (comma-separated)
 requirements = python3,kivy==2.1.0
