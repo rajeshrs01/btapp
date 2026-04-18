@@ -14,7 +14,7 @@ version = 1.0.0
 entrypoint = main
 
 # Python requirements (comma-separated)
-requirements = python3,kivy==2.3.0,pybluez,pyaudio
+requirements = python3,kivy==2.3.0
 
 # Orientation
 orientation = portrait
