@@ -49,8 +49,7 @@ jobs:
           key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Build APK
-        run: yes | buildozer -v android debug 2>&1 | tee build.log; tail -50 build.log
-        continue-on-error: true
+        run: yes | buildozer -v android debug 2>&1 | tee build.log; tail -50 build.l
 
       - name: Show last errors
         run: grep -i "error\|exception\|failed\|traceback" build.log | tail -30 || true
@@ -60,4 +59,4 @@ jobs:
         with:
           name: bluetooth-app-debug.apk
           path: bin/*.apk
-          retention-days: 30
+          retention-days: 30	h
